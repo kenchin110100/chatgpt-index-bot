@@ -1,11 +1,11 @@
 import os
 import re
 from typing import List
+
+import pinecone
 from llama_index import SimpleWebPageReader
 
 from .setup import setup_index
-
-import pinecone
 
 INDEX_NAME = os.environ["INDEX_NAME"]
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]

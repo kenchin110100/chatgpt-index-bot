@@ -1,14 +1,14 @@
 import base64
 import json
 import logging
-from logging import DEBUG, StreamHandler, getLogger
 import os
-from flask import Flask, request
+from logging import DEBUG, StreamHandler, getLogger
+
 import urllib3
+from flask import Flask, request
 
-from .search import search_index
 from .register import register_index
-
+from .search import search_index
 
 # ロガーの準備
 logger = getLogger(__name__)
@@ -67,7 +67,7 @@ def index():
     except Exception as e:
         msg = "internal error"
         logger.info(f"error: {e}", exc_info=True)
-        return f"Internal Error", 200
+        return "Internal Error", 200
 
 
 if __name__ == "__main__":

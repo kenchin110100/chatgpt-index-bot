@@ -1,5 +1,5 @@
-from llama_index import LLMPredictor, ServiceContext, GPTPineconeIndex, OpenAIEmbedding
 from langchain import OpenAI
+from llama_index import GPTPineconeIndex, LLMPredictor, OpenAIEmbedding, ServiceContext
 
 
 def setup_index(predictor_model_name: str, embedding_model_name: str, db_index) -> GPTPineconeIndex:
