@@ -1,12 +1,12 @@
-import os
 import json
 import logging
+import os
 from logging import DEBUG, StreamHandler, getLogger
 
 from flask import Request
+from google.cloud import pubsub_v1
 from slack_bolt import App
 from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
-from google.cloud import pubsub_v1
 
 # ロガーの準備
 logger = getLogger(__name__)
@@ -34,7 +34,7 @@ def search_index(ack, respond, command):
     ack()
     data = {"type": "search", "query": command["text"]}
     data_str = json.dumps(data).encode("utf-8")
-    future = publisher.publish(topic_path, data_str)
+    _ = publisher.publish(topic_path, data_str)
     respond(f"質問を受け付けました、回答まで少々お待ちください\n\nメッセージ: {command['text']}")
 
 
@@ -43,13 +43,8 @@ def register_index(ack, respond, command):
     ack()
     data = {"type": "register", "query": command["text"]}
     data_str = json.dumps(data).encode("utf-8")
-    future = publisher.publish(topic_path, data_str)
+    _ = publisher.publish(topic_path, data_str)
     respond(f"登録を受け付けました、完了まで少々お待ちください\n\nメッセージ: {command['text']}")
-
-
-@app.message("chatgpt")
-def search_index(message, say):
-    say(f"{message}")
 
 
 # Cloud Functions で呼び出されるエントリポイント
