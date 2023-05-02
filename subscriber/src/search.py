@@ -1,8 +1,9 @@
 import os
-from .prompt import CUSTOM_TEXT_QA_PROMPT, CUSTOM_REFINE_PROMPT
-from .setup import setup_index
 
 import pinecone
+
+from .prompt import CUSTOM_REFINE_PROMPT, CUSTOM_TEXT_QA_PROMPT
+from .setup import setup_index
 
 INDEX_NAME = os.environ["INDEX_NAME"]
 PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
