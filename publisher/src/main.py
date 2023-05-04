@@ -4,7 +4,7 @@ import os
 from logging import DEBUG, StreamHandler, getLogger
 
 from flask import Request
-from google.cloud import pubsub_v1
+from google.cloud import pubsub_v1, secretmanager
 from slack_bolt import App
 from slack_bolt.adapter.google_cloud_functions import SlackRequestHandler
 
@@ -17,14 +17,26 @@ formatter = logging.Formatter("%(asctime)s - %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+# 環境変数の取得
+project_id = os.environ.get("PROJECT_ID")
+topic_id = os.environ.get("TOPIC_ID")
+slack_token_secret_id = os.environ.get("SLACK_BOT_TOKEN_SECRET_ID")
+slack_singing_secret_id = os.environ.get("SLACK_SINGING_SECRET_ID")
 
-slack_token = os.environ.get("SLACK_BOT_TOKEN")
-slack_singing_secret = os.environ.get("SLACK_SINGING_SECRET")
+# secret mangerでsecretの取得
+client = secretmanager.SecretManagerServiceClient()
+slack_token = client.access_secret_version(
+    request={"name": f"projects/{project_id}/secrets/{slack_token_secret_id}/versions/latest"}
+).payload.data.decode("UTF-8")
+slack_singing_secret = client.access_secret_version(
+    request={"name": f"projects/{project_id}/secrets/{slack_singing_secret_id}/versions/latest"}
+).payload.data.decode("UTF-8")
+
+# APPのinit
 app = App(token=slack_token, signing_secret=slack_singing_secret, process_before_response=True)
 handler = SlackRequestHandler(app)
 
-project_id = os.environ.get("PROJECT_ID")
-topic_id = os.environ.get("TOPIC_ID")
+# Pub/Subのinit
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, topic_id)
 
