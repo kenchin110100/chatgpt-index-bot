@@ -67,6 +67,13 @@ def index():
     except Exception as e:
         msg = "internal error"
         logger.info(f"error: {e}", exc_info=True)
+
+        response_message = f"エラーが発生しました\n{e}"
+
+        MESSAGE_FORMAT["text"] = response_message
+        encoded_msg = json.dumps(MESSAGE_FORMAT).encode("utf-8")
+        resp = http.request("POST", SLACK_WEBHOOK_URL, body=encoded_msg)
+
         return "Internal Error", 200
 
 
