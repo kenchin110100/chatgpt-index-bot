@@ -31,6 +31,13 @@ module "subscriber" {
   index_name                  = var.index_name
 }
 
+module "pubsub" {
+  source                  = "./modules/pubsub"
+  project_name            = var.project_name
+  subscriber_endpoint_url = module.subscriber.subscriber_endpoint_url
+  pubsub_sa_email         = module.subscriber.pubsub_sa_email
+}
+
 module "publisher" {
   source                    = "./modules/publisher"
   source_dir                = "../publisher"
@@ -39,5 +46,5 @@ module "publisher" {
   project_name              = var.project_name
   slack_bot_token_secret_id = module.secret.slack_bot_token_secret_id
   slack_singing_secret_id   = module.secret.slack_singing_secret_id
-  pubsub_topic_id           = module.subscriber.pubsub_topic_id
+  pubsub_topic_id           = module.pubsub.pubsub_topic_id
 }

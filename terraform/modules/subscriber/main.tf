@@ -80,10 +80,6 @@ resource "google_cloud_run_service" "subscriber" {
   ]
 }
 
-resource "google_pubsub_topic" "default" {
-  name = "${var.project_name}-pubsub-topic"
-}
-
 resource "google_service_account" "sa" {
   account_id   = "cloud-run-pubsub-invoker"
   display_name = "Cloud Run Pub/Sub Invoker"
@@ -106,25 +102,6 @@ resource "google_project_iam_binding" "project_token_creator" {
   project = var.project
   role    = "roles/iam.serviceAccountTokenCreator"
   members = ["serviceAccount:${google_project_service_identity.pubsub_agent.email}"]
-}
-
-resource "google_pubsub_subscription" "subscription" {
-  name  = "pubsub_subscription"
-  topic = google_pubsub_topic.default.name
-
-  ack_deadline_seconds       = 600
-  message_retention_duration = "600s"
-
-  push_config {
-    push_endpoint = google_cloud_run_service.subscriber.status.0.url
-    oidc_token {
-      service_account_email = google_service_account.sa.email
-    }
-    attributes = {
-      x-goog-version = "v1"
-    }
-  }
-  depends_on = [google_cloud_run_service.subscriber]
 }
 
 # Secret Managerの権限付与

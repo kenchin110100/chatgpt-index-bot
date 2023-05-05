@@ -1,3 +1,6 @@
-output "pubsub_topic_id" {
-  value = google_pubsub_topic.default.name
+output "subscriber_endpoint_url" {
+  value = google_cloud_run_service.subscriber.status.0.url
+}
+output "pubsub_sa_email" {
+  value = google_service_account.sa.email
 }

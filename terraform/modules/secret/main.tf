@@ -5,7 +5,7 @@ resource "google_secret_manager_secret" "slack_bot_token" {
     automatic = true
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -20,7 +20,7 @@ resource "google_secret_manager_secret" "slack_singing_secret" {
     automatic = true
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -36,7 +36,7 @@ resource "google_secret_manager_secret" "slack_webhook_url" {
     automatic = true
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -51,7 +51,7 @@ resource "google_secret_manager_secret" "openai_api_key" {
     automatic = true
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
@@ -66,7 +66,7 @@ resource "google_secret_manager_secret" "pinecone_api_key" {
     automatic = true
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
