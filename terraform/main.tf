@@ -18,8 +18,9 @@ module "secret" {
 }
 
 module "account" {
-  source = "./modules/account"
-  project = var.project
+  source       = "./modules/account"
+  project      = var.project
+  project_name = var.project_name
 }
 
 module "subscriber" {
@@ -34,14 +35,15 @@ module "subscriber" {
   pinecone_api_key_secret_id  = module.secret.pinecone_api_key_secret_id
   pinecone_environment        = var.pinecone_environment
   index_name                  = var.index_name
-  pubsub_sa_email             = module.account.pubsub_sa_email
+  pubsub_invoker_email        = module.account.pubsub_invoker_email
+  subscriber_runner_email     = module.account.subscriber_runner_email
 }
 
 module "pubsub" {
   source                  = "./modules/pubsub"
   project_name            = var.project_name
   subscriber_endpoint_url = module.subscriber.subscriber_endpoint_url
-  pubsub_sa_email         = module.account.pubsub_sa_email
+  pubsub_invoker_email    = module.account.pubsub_invoker_email
 }
 
 module "publisher" {
@@ -53,4 +55,5 @@ module "publisher" {
   slack_bot_token_secret_id = module.secret.slack_bot_token_secret_id
   slack_singing_secret_id   = module.secret.slack_singing_secret_id
   pubsub_topic_id           = module.pubsub.pubsub_topic_id
+  publisher_runner_email    = module.account.publisher_runner_email
 }

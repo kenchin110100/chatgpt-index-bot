@@ -30,6 +30,7 @@ resource "google_cloud_run_service" "subscriber" {
 
   template {
     spec {
+      service_account_name = var.subscriber_runner_email
       containers {
         image = "gcr.io/${var.project}/${var.project_name}-subscriber"
 
@@ -82,5 +83,5 @@ resource "google_cloud_run_service_iam_binding" "binding" {
   location = google_cloud_run_service.subscriber.location
   service  = google_cloud_run_service.subscriber.name
   role     = "roles/run.invoker"
-  members  = ["serviceAccount:${var.pubsub_sa_email}"]
+  members  = ["serviceAccount:${var.pubsub_invoker_email}"]
 }
