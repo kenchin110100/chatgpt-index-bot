@@ -1,6 +1,4 @@
-data "google_project" "project" {
-  provider = google-beta
-}
+data "google_project" "project" {}
 
 data "archive_file" "zip" {
   type        = "zip"
@@ -37,9 +35,14 @@ resource "google_cloud_run_service" "subscriber" {
       containers {
         image = "gcr.io/${var.project}/${var.project_name}-subscriber"
 
+	env {
+	  name = "PROJECT_ID"
+	  value = var.project
+        }
+
         env {
-	  name = "SLACK_WEBHOOK_URL"
-	  value = var.slack_webhook_url
+	  name = "SLACK_WEBHOOK_URL_SECRET_ID"
+	  value = google_secret_manager_secret.slack_webhook_url.secret_id
         }
         env {
 	  name = "CHANNEL_NAME"
@@ -50,12 +53,12 @@ resource "google_cloud_run_service" "subscriber" {
 	  value = var.project_name
         }
 	env {
-	  name = "OPENAI_API_KEY"
-	  value = var.openai_api_key
+	  name = "OPENAI_API_KEY_SECRET_ID"
+	  value = google_secret_manager_secret.openai_api_key.secret_id
         }
 	env {
-	  name = "PINECONE_API_KEY"
-	  value = var.pinecone_api_key
+	  name = "PINECONE_API_KEY_SECRET_ID"
+	  value = google_secret_manager_secret.pinecone_api_key.secret_id
         }
 	env {
 	  name = "PINECONE_ENVIRONMENT"
@@ -122,4 +125,57 @@ resource "google_pubsub_subscription" "subscription" {
     }
   }
   depends_on = [google_cloud_run_service.subscriber]
+}
+
+# secret
+resource "google_secret_manager_secret" "slack_webhook_url" {
+  secret_id = "SLACK_WEBHOOK_URL_SECRET_ID"
+  replication {
+    automatic = true
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "slack_webhook_url_version" {
+  secret = google_secret_manager_secret.slack_webhook_url.id
+  secret_data = var.slack_webhook_url
+}
+
+resource "google_secret_manager_secret" "openai_api_key" {
+  secret_id = "OPENAI_API_KEY_SECRET_ID"
+  replication {
+    automatic = true
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "openai_api_key_version" {
+  secret = google_secret_manager_secret.openai_api_key.id
+  secret_data = var.openai_api_key
+}
+
+resource "google_secret_manager_secret" "pinecone_api_key" {
+  secret_id = "PINECONE_API_KEY_SECRET_ID"
+  replication {
+    automatic = true
+  }
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "pinecone_api_key_version" {
+  secret = google_secret_manager_secret.pinecone_api_key.id
+  secret_data = var.pinecone_api_key
+}
+
+# Secret Managerの権限付与
+resource "google_project_iam_member" "secret_manager_account" {
+  project = var.project
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
 }

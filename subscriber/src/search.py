@@ -1,24 +1,9 @@
-import os
-
-import pinecone
-
 from .prompt import CUSTOM_REFINE_PROMPT, CUSTOM_TEXT_QA_PROMPT
-from .setup import setup_index
-
-INDEX_NAME = os.environ["INDEX_NAME"]
-PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
-PINECONE_ENVIRONMENT = os.environ["PINECONE_ENVIRONMENT"]
-
-PREDICTOR_MODEL_NAME = "gpt-3.5-turbo"
-EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
-SIMILARITY_TOP_K = 3
+from .setup import setup_index, SIMILARITY_TOP_K
 
 
 def search_index(search_query: str) -> str:
-    pinecone_index = pinecone.Index(INDEX_NAME)
-    index = setup_index(
-        predictor_model_name=PREDICTOR_MODEL_NAME, embedding_model_name=EMBEDDING_MODEL_NAME, db_index=pinecone_index
-    )
+    index, _ = setup_index()
 
     response = index.query(
         search_query,

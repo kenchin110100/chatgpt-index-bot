@@ -9,6 +9,7 @@ from flask import Flask, request
 
 from .register import register_index
 from .search import search_index
+from .setup import CHANNEL_NAME, USERNAME, SLACK_WEBHOOK_URL
 
 # ロガーの準備
 logger = getLogger(__name__)
@@ -21,10 +22,6 @@ logger.addHandler(ch)
 
 app = Flask(__name__)
 http = urllib3.PoolManager()
-
-SLACK_WEBHOOK_URL = os.environ["SLACK_WEBHOOK_URL"]
-CHANNEL_NAME = os.environ["CHANNEL_NAME"]
-USERNAME = os.environ["USERNAME"]
 
 
 @app.route("/", methods=["POST"])

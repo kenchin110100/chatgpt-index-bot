@@ -1,27 +1,13 @@
-import os
 import re
 from typing import List
 
-import pinecone
 from llama_index import SimpleWebPageReader
 
-from .setup import setup_index
-
-INDEX_NAME = os.environ["INDEX_NAME"]
-PINECONE_API_KEY = os.environ["PINECONE_API_KEY"]
-PINECONE_ENVIRONMENT = os.environ["PINECONE_ENVIRONMENT"]
-
-PREDICTOR_MODEL_NAME = "gpt-3.5-turbo"
-EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
-SIMILARITY_TOP_K = 3
-VECTOR_SIZE = 1536
+from .setup import setup_index, SIMILARITY_TOP_K, VECTOR_SIZE
 
 
 def register_index(register_query: str) -> str:
-    pinecone_index = pinecone.Index(INDEX_NAME)
-    index = setup_index(
-        predictor_model_name=PREDICTOR_MODEL_NAME, embedding_model_name=EMBEDDING_MODEL_NAME, db_index=pinecone_index
-    )
+    index, pinecone_index = setup_index()
 
     urls = find_urls(register_query)
 
