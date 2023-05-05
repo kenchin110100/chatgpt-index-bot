@@ -52,8 +52,8 @@ resource "google_cloudfunctions_function" "function" {
   min_instances         = 1
 
   environment_variables = {
-    SLACK_BOT_TOKEN_SECRET_ID  = google_secret_manager_secret.slack_bot_token.secret_id
-    SLACK_SINGING_SECRET_ID       = google_secret_manager_secret.slack_singing_secret.secret_id
+    SLACK_BOT_TOKEN_SECRET_ID  = var.slack_bot_token_secret_id
+    SLACK_SINGING_SECRET_ID    = var.slack_singing_secret_id
     PROJECT_ID                 = var.project
     TOPIC_ID                   = var.pubsub_topic_id
   }
@@ -67,42 +67,4 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
 
   role   = "roles/cloudfunctions.invoker"
   member = "allUsers"
-}
-
-# secret
-resource "google_secret_manager_secret" "slack_bot_token" {
-  secret_id = "SLACK_BOT_TOKEN_SECRET_ID"
-  replication {
-    automatic = true
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "slack_bot_token_version" {
-  secret = google_secret_manager_secret.slack_bot_token.id
-  secret_data = var.slack_bot_token
-}
-
-resource "google_secret_manager_secret" "slack_singing_secret" {
-  secret_id = "SLACK_SINGING_SECRET_ID"
-  replication {
-    automatic = true
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "slack_singing_secret_version" {
-  secret = google_secret_manager_secret.slack_singing_secret.id
-  secret_data = var.slack_singing_secret
-}
-
-# Secret Managerの権限付与
-resource "google_project_iam_member" "secret_manager_account" {
-  project = var.project
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${var.project}@appspot.gserviceaccount.com"
 }

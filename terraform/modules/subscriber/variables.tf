@@ -2,9 +2,10 @@ variable "project" {}
 variable "source_dir" {}
 variable "region" {}
 variable "project_name" {}
-variable "slack_webhook_url" {}
+variable "slack_webhook_url_secret_id" {}
 variable "channel_name" {}
-variable "openai_api_key" {}
-variable "pinecone_api_key" {}
+variable "openai_api_key_secret_id" {}
+variable "pinecone_api_key_secret_id" {}
 variable "pinecone_environment" {}
 variable "index_name" {}
+variable "pubsub_sa_email" {}
