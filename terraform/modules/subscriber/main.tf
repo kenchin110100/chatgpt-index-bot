@@ -42,7 +42,7 @@ resource "google_cloud_run_service" "subscriber" {
 
         env {
 	  name = "SLACK_WEBHOOK_URL_SECRET_ID"
-	  value = google_secret_manager_secret.slack_webhook_url.secret_id
+	  value = var.slack_webhook_url_secret_id
         }
         env {
 	  name = "CHANNEL_NAME"
@@ -54,11 +54,11 @@ resource "google_cloud_run_service" "subscriber" {
         }
 	env {
 	  name = "OPENAI_API_KEY_SECRET_ID"
-	  value = google_secret_manager_secret.openai_api_key.secret_id
+	  value = var.openai_api_key_secret_id
         }
 	env {
 	  name = "PINECONE_API_KEY_SECRET_ID"
-	  value = google_secret_manager_secret.pinecone_api_key.secret_id
+	  value = var.pinecone_api_key_secret_id
         }
 	env {
 	  name = "PINECONE_ENVIRONMENT"
@@ -125,52 +125,6 @@ resource "google_pubsub_subscription" "subscription" {
     }
   }
   depends_on = [google_cloud_run_service.subscriber]
-}
-
-# secret
-resource "google_secret_manager_secret" "slack_webhook_url" {
-  secret_id = "SLACK_WEBHOOK_URL_SECRET_ID"
-  replication {
-    automatic = true
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "slack_webhook_url_version" {
-  secret = google_secret_manager_secret.slack_webhook_url.id
-  secret_data = var.slack_webhook_url
-}
-
-resource "google_secret_manager_secret" "openai_api_key" {
-  secret_id = "OPENAI_API_KEY_SECRET_ID"
-  replication {
-    automatic = true
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "openai_api_key_version" {
-  secret = google_secret_manager_secret.openai_api_key.id
-  secret_data = var.openai_api_key
-}
-
-resource "google_secret_manager_secret" "pinecone_api_key" {
-  secret_id = "PINECONE_API_KEY_SECRET_ID"
-  replication {
-    automatic = true
-  }
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_secret_manager_secret_version" "pinecone_api_key_version" {
-  secret = google_secret_manager_secret.pinecone_api_key.id
-  secret_data = var.pinecone_api_key
 }
 
 # Secret Managerの権限付与
