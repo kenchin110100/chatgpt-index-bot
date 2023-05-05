@@ -1,5 +1,3 @@
-data "google_project" "project" {}
-
 data "archive_file" "zip" {
   type        = "zip"
   source_dir  = "${var.source_dir}/"
@@ -80,33 +78,9 @@ resource "google_cloud_run_service" "subscriber" {
   ]
 }
 
-resource "google_service_account" "sa" {
-  account_id   = "cloud-run-pubsub-invoker"
-  display_name = "Cloud Run Pub/Sub Invoker"
-}
-
 resource "google_cloud_run_service_iam_binding" "binding" {
   location = google_cloud_run_service.subscriber.location
   service  = google_cloud_run_service.subscriber.name
   role     = "roles/run.invoker"
-  members  = ["serviceAccount:${google_service_account.sa.email}"]
-}
-
-resource "google_project_service_identity" "pubsub_agent" {
-  provider = google-beta
-  project  = var.project
-  service  = "pubsub.googleapis.com"
-}
-
-resource "google_project_iam_binding" "project_token_creator" {
-  project = var.project
-  role    = "roles/iam.serviceAccountTokenCreator"
-  members = ["serviceAccount:${google_project_service_identity.pubsub_agent.email}"]
-}
-
-# Secret Managerの権限付与
-resource "google_project_iam_member" "secret_manager_account" {
-  project = var.project
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+  members  = ["serviceAccount:${var.pubsub_sa_email}"]
 }

@@ -8,3 +8,4 @@ variable "openai_api_key_secret_id" {}
 variable "pinecone_api_key_secret_id" {}
 variable "pinecone_environment" {}
 variable "index_name" {}
+variable "pubsub_sa_email" {}

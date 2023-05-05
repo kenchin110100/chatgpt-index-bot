@@ -68,10 +68,3 @@ resource "google_cloudfunctions_function_iam_member" "invoker" {
   role   = "roles/cloudfunctions.invoker"
   member = "allUsers"
 }
-
-# Secret Managerの権限付与
-resource "google_project_iam_member" "secret_manager_account" {
-  project = var.project
-  role    = "roles/secretmanager.secretAccessor"
-  member  = "serviceAccount:${var.project}@appspot.gserviceaccount.com"
-}

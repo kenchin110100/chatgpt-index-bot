@@ -17,6 +17,11 @@ module "secret" {
   pinecone_api_key      = var.pinecone_api_key
 }
 
+module "account" {
+  source = "./modules/account"
+  project = var.project
+}
+
 module "subscriber" {
   source                      = "./modules/subscriber"
   source_dir                  = "../subscriber"
@@ -29,13 +34,14 @@ module "subscriber" {
   pinecone_api_key_secret_id  = module.secret.pinecone_api_key_secret_id
   pinecone_environment        = var.pinecone_environment
   index_name                  = var.index_name
+  pubsub_sa_email             = module.account.pubsub_sa_email
 }
 
 module "pubsub" {
   source                  = "./modules/pubsub"
   project_name            = var.project_name
   subscriber_endpoint_url = module.subscriber.subscriber_endpoint_url
-  pubsub_sa_email         = module.subscriber.pubsub_sa_email
+  pubsub_sa_email         = module.account.pubsub_sa_email
 }
 
 module "publisher" {
