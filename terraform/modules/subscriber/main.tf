@@ -24,53 +24,51 @@ resource "null_resource" "cloud_build_deploy" {
   depends_on = [data.archive_file.zip]
 }
 
-resource "google_cloud_run_service" "subscriber" {
+resource "google_cloud_run_v2_service" "subscriber" {
   name     = "${var.project_name}-subscriber"
   location = var.region
-
+  ingress  = "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+  
   template {
-    spec {
-      service_account_name = var.subscriber_runner_email
-      containers {
-        image = "gcr.io/${var.project}/${var.project_name}-subscriber"
+    service_account = var.subscriber_runner_email
+    containers {
+      image = "gcr.io/${var.project}/${var.project_name}-subscriber"
+      env {
+	name = "PROJECT_ID"
+	value = var.project
+      }
 
-	env {
-	  name = "PROJECT_ID"
-	  value = var.project
-        }
-
-        env {
-	  name = "SLACK_WEBHOOK_URL_SECRET_ID"
-	  value = var.slack_webhook_url_secret_id
-        }
-        env {
-	  name = "CHANNEL_NAME"
-	  value = var.channel_name
-        }
-        env {
-	  name = "USERNAME"
-	  value = var.project_name
-        }
-	env {
-	  name = "OPENAI_API_KEY_SECRET_ID"
-	  value = var.openai_api_key_secret_id
-        }
-	env {
-	  name = "PINECONE_API_KEY_SECRET_ID"
-	  value = var.pinecone_api_key_secret_id
-        }
-	env {
-	  name = "PINECONE_ENVIRONMENT"
-	  value = var.pinecone_environment
-        }
-	env {
-	  name = "INDEX_NAME"
-	  value = var.index_name
-        }
-	env {
-	  name = "SOURCE_CODE_HASH"
-	  value = data.archive_file.zip.output_md5
-        }
+      env {
+	name = "SLACK_WEBHOOK_URL_SECRET_ID"
+	value = var.slack_webhook_url_secret_id
+      }
+      env {
+	name = "CHANNEL_NAME"
+	value = var.channel_name
+      }
+      env {
+	name = "USERNAME"
+	value = var.project_name
+      }
+      env {
+	name = "OPENAI_API_KEY_SECRET_ID"
+	value = var.openai_api_key_secret_id
+      }
+      env {
+	name = "PINECONE_API_KEY_SECRET_ID"
+	value = var.pinecone_api_key_secret_id
+      }
+      env {
+	name = "PINECONE_ENVIRONMENT"
+	value = var.pinecone_environment
+      }
+      env {
+	name = "INDEX_NAME"
+	value = var.index_name
+      }
+      env {
+	name = "SOURCE_CODE_HASH"
+	value = data.archive_file.zip.output_md5
       }
     }
   }
@@ -79,9 +77,9 @@ resource "google_cloud_run_service" "subscriber" {
   ]
 }
 
-resource "google_cloud_run_service_iam_binding" "binding" {
-  location = google_cloud_run_service.subscriber.location
-  service  = google_cloud_run_service.subscriber.name
+resource "google_cloud_run_v2_service_iam_binding" "binding" {
+  location = google_cloud_run_v2_service.subscriber.location
+  name     = google_cloud_run_v2_service.subscriber.name
   role     = "roles/run.invoker"
   members  = ["serviceAccount:${var.pubsub_invoker_email}"]
 }
