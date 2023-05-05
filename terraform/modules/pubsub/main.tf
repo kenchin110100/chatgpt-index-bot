@@ -12,7 +12,7 @@ resource "google_pubsub_subscription" "subscription" {
   push_config {
     push_endpoint = var.subscriber_endpoint_url
     oidc_token {
-      service_account_email = var.pubsub_sa_email
+      service_account_email = var.pubsub_invoker_email
     }
     attributes = {
       x-goog-version = "v1"

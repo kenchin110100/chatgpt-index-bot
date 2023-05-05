@@ -48,6 +48,8 @@ resource "google_cloudfunctions_function" "function" {
 
   trigger_http          = true
 
+  service_account_email = var.publisher_runner_email
+
   # コールドスタート問題に対応
   min_instances         = 1
 
