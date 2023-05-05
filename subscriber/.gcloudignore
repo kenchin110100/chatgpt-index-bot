@@ -1,0 +1,5 @@
+.venv
+.vecode
+dist
+.env
+src/__pycache__
