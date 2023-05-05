@@ -34,39 +34,45 @@ resource "google_storage_bucket_object" "archive" {
 }
 
 # Deploy cloud functions
-resource "google_cloudfunctions_function" "function" {
+resource "google_cloudfunctions2_function" "function" {
   project               = var.project
-  region                = var.region
+  location              = var.region
   name                  = "${var.project_name}-publisher"
-  runtime               = "python311"
 
-  available_memory_mb   = 512
-  source_archive_bucket = google_storage_bucket_object.archive.bucket
-  source_archive_object = google_storage_bucket_object.archive.name
-  timeout               = 540
-  entry_point           = "slack_bot"
+  build_config {
+    runtime = "python311"
+    entry_point = "slack_bot"
+    source {
+      storage_source {
+        bucket = google_storage_bucket_object.archive.bucket
+        object = google_storage_bucket_object.archive.name
+      }
+    }
+  }
 
-  trigger_http          = true
+  service_config {
+    available_memory = "512M"
+    timeout_seconds  = 540
+    # コールドスタート問題に対応
+    min_instance_count = 1
 
-  service_account_email = var.publisher_runner_email
+    service_account_email = var.publisher_runner_email
 
-  # コールドスタート問題に対応
-  min_instances         = 1
-
-  environment_variables = {
-    SLACK_BOT_TOKEN_SECRET_ID  = var.slack_bot_token_secret_id
-    SLACK_SINGING_SECRET_ID    = var.slack_singing_secret_id
-    PROJECT_ID                 = var.project
-    TOPIC_ID                   = var.pubsub_topic_id
+    environment_variables = {
+      SLACK_BOT_TOKEN_SECRET_ID  = var.slack_bot_token_secret_id
+      SLACK_SINGING_SECRET_ID    = var.slack_singing_secret_id
+      PROJECT_ID                 = var.project
+      TOPIC_ID                   = var.pubsub_topic_id
+    }
   }
 }
 
-# IAM entry for all users to invoke the function
-resource "google_cloudfunctions_function_iam_member" "invoker" {
-  project        = google_cloudfunctions_function.function.project
-  region         = google_cloudfunctions_function.function.region
-  cloud_function = google_cloudfunctions_function.function.name
+# cloud fuctions v2 の裏側はcloud run v1で動いているので、cloud runにallUserのinvokerを付与する
+resource "google_cloud_run_service_iam_member" "invoker" {
+  project        = google_cloudfunctions2_function.function.project
+  location       = google_cloudfunctions2_function.function.location
+  service        = google_cloudfunctions2_function.function.name
 
-  role   = "roles/cloudfunctions.invoker"
+  role   = "roles/run.invoker"
   member = "allUsers"
 }
