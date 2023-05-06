@@ -9,7 +9,7 @@ from flask import Flask, request
 
 from .register import register_index
 from .search import search_index
-from .setup import CHANNEL_NAME, USERNAME, SLACK_WEBHOOK_URL
+from .setup import CHANNEL_NAME, SLACK_WEBHOOK_URL, USERNAME
 
 # ロガーの準備
 logger = getLogger(__name__)
@@ -71,7 +71,7 @@ def index():
         encoded_msg = json.dumps(MESSAGE_FORMAT).encode("utf-8")
         resp = http.request("POST", SLACK_WEBHOOK_URL, body=encoded_msg)
 
-        return "Internal Error", 200
+        return "Internal Error", 500
 
 
 if __name__ == "__main__":

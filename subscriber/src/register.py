@@ -3,7 +3,7 @@ from typing import List
 
 from llama_index import SimpleWebPageReader
 
-from .setup import setup_index, SIMILARITY_TOP_K, VECTOR_SIZE
+from .setup import SIMILARITY_TOP_K, VECTOR_SIZE, setup_index
 
 
 def register_index(register_query: str) -> str:

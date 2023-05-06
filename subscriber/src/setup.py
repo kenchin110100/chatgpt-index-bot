@@ -1,8 +1,10 @@
 import os
+
+import pinecone
 from google.cloud import secretmanager
 from langchain import OpenAI
-from llama_index import GPTPineconeIndex, LLMPredictor, OpenAIEmbedding, ServiceContext
-import pinecone
+from llama_index import GPTVectorStoreIndex, LLMPredictor, OpenAIEmbedding, ServiceContext, StorageContext
+from llama_index.vector_stores import PineconeVectorStore
 
 # 環境変数の取得
 
@@ -33,23 +35,24 @@ OPENAI_API_KEY = client.access_secret_version(
     request={"name": f"projects/{PROJECT_ID}/secrets/{OPENAI_API_KEY_SECRET_ID}/versions/latest"}
 ).payload.data.decode("UTF-8")
 
-# FIXME: llama_index ver0.5.27ではEmbeddingモデルにapi_keyを指定することができないので、環境変数にOPENAI_API_KEYを設定する
+# FIXME: llama_index ver0.6.1ではEmbeddingモデルにapi_keyを指定することができないので、環境変数にOPENAI_API_KEYを設定する
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 
 def setup_index():
     pinecone.init(api_key=PINECONE_API_KEY, environment=PINECONE_ENVIRONMENT)
     pinecone_index = pinecone.Index(INDEX_NAME)
+    vector_store = PineconeVectorStore(pinecone_index=pinecone_index)
+    storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
     llm_predictor = LLMPredictor(
         llm=OpenAI(temperature=0, model_name=PREDICTOR_MODEL_NAME, openai_api_key=OPENAI_API_KEY)
     )
-
     embed_model = OpenAIEmbedding(model=EMBEDDING_MODEL_NAME)
-
     service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor, embed_model=embed_model)
 
-    index = GPTPineconeIndex.from_documents(
-        pinecone_index=pinecone_index, documents=[], service_context=service_context
+    index = GPTVectorStoreIndex.from_documents(
+        documents=[], service_context=service_context, storage_context=storage_context
     )
 
     return index, pinecone_index
