@@ -20,7 +20,7 @@ LllmaIndexのIndexサーチ機能を利用したSlackボット
 - 2モジュール作成しているのは、slackbotの[3秒ルール](https://api.slack.com/interactivity/handling#acknowledgment_response)に対応するため
 - publisherとsubscriber間の通信にはPub/Subを利用
 
-![System](image/system_architecture.png)
+![System](image/system_architecture_v2.png)
 
 ## 機能
 
