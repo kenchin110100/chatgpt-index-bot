@@ -6,17 +6,19 @@ LllmaIndexのIndexサーチ機能を利用したSlackボット
 
 # DEMO
 
-![Demo](image/demo.png)
+- slack上で/register-index `url`と入力することで、記事の登録を行う
+![Demo_register](image/demo_register.png)
+
+- slack上で/search-index `質問文`と入力することで、事前に登録された記事を元に回答を作成する
+![Demo](image/demo_search.png)
 
 # Features
 
 ## システム概要
 
-リクエスト受付用のpublisherと処理＋検索用のsubscriberの2モジュールからなる
-
-publisherはcloudfunctions、subscriberはcloudrunで構築
-
-publisherとsubscriber間の通信にはPub/Subを利用
+- リクエスト受付用のpublisherと処理＋検索用のsubscriberの2モジュールからなる
+- 2モジュール作成しているのは、slackbotの[3秒ルール](https://api.slack.com/interactivity/handling#acknowledgment_response)に対応するため
+- publisherとsubscriber間の通信にはPub/Subを利用
 
 ![System](image/system_architecture.png)
 
@@ -66,18 +68,4 @@ index_name = "PINECONEのインデックス名"
 ```
 $ cd terraform && terraform init
 $ make deploy
-```
-
-# Usage
-
-検索機能はSlackのチャンネル上で以下を実施
-
-```
-/search-index Pub/Subについて教えてだくさい
-```
-
-登録機能はSlackのチャンネル上で以下を実施
-
-```
-/register-index https://xxxxxxxxxxx.com
 ```
